@@ -1,6 +1,6 @@
 
 
-import express, { Request, Response } from 'express';
+import express, { type Request, type Response } from 'express';
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import cors from 'cors';
