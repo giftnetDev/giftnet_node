@@ -1,46 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import List from './components/List/List';
 
-//데이터 타입 정의 (기존 matchingFunc 대신 타입을 명확히 함)
-interface ItemData{
-    id: number;
-    message:string;
+interface RingBufferData{
+    ID: number,
+    GOODS_NO: number,
+    IN_DATE: string,
+    EXPIRATION_DATE: string,
+    THRESHOLD:string,
+    REMAINING_DAYS: number
 }
 
-function App() {
-
-    const [data, setData] = useState<ItemData[]>([]);
+function App(){
+    const [data, setData] = useState<RingBufferData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage =10;
 
-    useEffect( ()=>{
-        //벡엔드에서 데이터 가져오기
-        fetch('http://localhost:3000/api/test') //벡엔드 주소 확인
-            .then(res => res.json())
+    useEffect(() =>{
+        fetch('http://localhost:4000/api/ring-buffer')
+            .then(res=>res.json())
             .then(result =>{
                 setData(result);
-                setLoading(false);
-            })
-            .catch(err =>{
-                console.error(err);
                 setLoading(false);
             });
     }, []);
 
-    return (
-        <div style={{padding: '20px'}}>
-            <h1> 범용 리스트 테스트</h1>
+    // 페이징 계산
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
 
-            <List items={data}
-                  loading={loading}
-                  renderItem={(item) =>(
-                      <div style={{ borderBottom: '1px solid #ccc', padding: '10px' }}>
-                          <strong>ID:</strong> {item.id} | <strong>내용:</strong> {item.message}
-                      </div>
-                  )}
-            />
+
+    // 바닐라 JS의 metchingFunc과 같은 역활(자유로운 UI 설계)
+    const myMatchingFunc = (item: RingBufferData) =>(
+        <div style={{
+            border: '1px solid #ddd',
+            margin: '5px 0',
+            padding: '15px',
+            borderRadius: '8px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: item.REMAINING_DAYS <= 7 ? '#fff5f5' : '#fff'
+        }}>
+            <div>
+                <span style={{fontWeight: 'bold', marginRight: '10px'}}>#{item.ID}</span>
+                <strong>상품번호: {item.GOODS_NO}</strong>
+            </div>
+            <div>
+                <small>입고: {item.IN_DATE.split('T')[0]}</small>
+                <span style={{
+                    marginLeft: '20px',
+                    color: item.REMAINING_DAYS <7 ? 'red' : 'blue',
+                    fontWeight: 'bold'
+                }}>
+                    {item.REMAINING_DAYS}일 남음
+                </span>
+            </div>
         </div>
     );
-    // 초기값을 '연결 중...'으로 설정합니다.
+
+    return (
+        <div style={{padding: '20px'}}>
+            <h1>ERP 자유형 리스트 시스템</h1>
+
+            <List
+                className="my-erp-list"
+                items={currentItems}
+                totalCount={data.length}
+                loading={loading}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                renderItem={myMatchingFunc}
+            />
+
+        </div>
+    );
 }
 
 export default App;
