@@ -9,10 +9,16 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": ["node_modules/*"],
+      "@shared/*": ["../shared/*"]
     },
     "jsx": "react-jsx"
   },
-  "include": ["server.ts", "src/**/*"],
+  // [수정] 컴파일러가 프론트엔드 내부 뿐만 아니라 바깥의 shared 폴더도 감시하도록 추가
+  "include": [
+    "server.ts",
+    "src/**/*",
+    "../shared/**/*"
+  ],
   "exclude": ["node_modules"]
 }

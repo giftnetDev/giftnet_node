@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true, // 필수: CommonJS와 ESM 사이의 호환성을 높여줍니다.
     "skipLibCheck": true,
     "strict": true,
@@ -12,10 +12,20 @@
     "jsx": "react-jsx",
     "verbatimModuleSyntax": false, // 엄격한 문법 체크 완화
     "isolatedModules": false, // 백엔드 실행을 위해 false 권장
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
   },
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
-  }
+  },
+  "include": [
+    "src/**/*",
+    "server.ts",
+    "../shared/**/*"
+  ]
 }
